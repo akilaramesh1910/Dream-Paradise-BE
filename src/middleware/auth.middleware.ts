@@ -1,42 +1,21 @@
+// auth.middleware.ts
 import { Request, Response, NextFunction } from 'express';
-import jwt from 'jsonwebtoken';
-import { CustomError } from './error.middleware';
+import jwt, { JwtPayload } from 'jsonwebtoken';
 
-export interface AuthRequest extends Request {
-  user?: any;
-}
+type TokenPayload = JwtPayload & { id: string; role?: string };
 
-export const protect = async (
-  req: AuthRequest,
-  res: Response,
-  next: NextFunction
-) => {
+export const protect = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    let token;
+    const auth = req.headers.authorization;
+    const token = auth?.startsWith('Bearer ') ? auth.slice(7) : undefined;
+    if (!token) return res.status(401).json({ message: 'Not authorized' });
 
-    if (
-      req.headers.authorization &&
-      req.headers.authorization.startsWith('Bearer')
-    ) {
-      token = req.headers.authorization.split(' ')[1];
-    }
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as TokenPayload;
+    if (!decoded?.id) return res.status(401).json({ message: 'Token invalid' });
 
-    if (!token) {
-      const error: CustomError = new Error('Not authorized to access this route');
-      error.statusCode = 401;
-      throw error;
-    }
-
-    try {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET as string);
-      req.user = decoded;
-      next();
-    } catch (error) {
-      const err: CustomError = new Error('Not authorized to access this route');
-      err.statusCode = 401;
-      throw err;
-    }
-  } catch (error) {
-    next(error);
+    req.user = { id: decoded.id, role: decoded.role }; // now matches the global type
+    return next();
+  } catch {
+    return res.status(401).json({ message: 'Not authorized' });
   }
 };

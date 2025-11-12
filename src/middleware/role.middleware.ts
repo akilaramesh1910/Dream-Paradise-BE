@@ -1,18 +1,18 @@
 import { Request, Response, NextFunction } from 'express';
 import { CustomError } from './error.middleware';
-import { AuthRequest } from './auth.middleware';
 
-// Middleware to check if user is admin
-export const isAdmin = async (req: AuthRequest, res: Response, next: NextFunction) => {
+type AuthUser = { _id: string; role: 'user' | 'admin' };
+type AuthRequest = Request & { user?: AuthUser };
+
+export const isAdmin = (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     if (req.user && req.user.role === 'admin') {
-      next();
-    } else {
-      const error: CustomError = new Error('Not authorized as an admin');
-      error.statusCode = 403;
-      throw error;
+      return next();
     }
-  } catch (error) {
-    next(error);
+    const error: CustomError = new Error('Not authorized as an admin') as CustomError;
+    error.statusCode = 403;
+    throw error;
+  } catch (err) {
+    next(err);
   }
 };

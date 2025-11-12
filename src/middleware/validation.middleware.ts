@@ -2,6 +2,18 @@ import { Request, Response, NextFunction } from 'express';
 import { check, validationResult } from 'express-validator';
 import { CustomError } from './error.middleware';
 
+function validateResults(req: Request, res: Response, next: NextFunction) {
+  try {
+    validationResult(req).throw(); // throws if any errors exist
+    return next();
+  } catch (err: any) {
+    return res.status(400).json({
+      message: 'Validation Error',
+      errors: err.errors ?? [],
+    });
+  }
+}
+
 // Validation for user registration
 export const validateRegister = [
   check('name', 'Name is required').not().isEmpty(),
@@ -48,15 +60,3 @@ export const validateNewsletter = [
   check('email', 'Please include a valid email').isEmail(),
   validateResults,
 ];
-
-// Common validation result checker
-const validateResults = (req: Request, res: Response, next: NextFunction) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    const error: CustomError = new Error('Validation Error');
-    error.statusCode = 400;
-    error.errors = errors.array();
-    throw error;
-  }
-  next();
-};

@@ -1,11 +1,16 @@
 import Stripe from 'stripe';
 
 const stripeSecret = process.env.STRIPE_SECRET_KEY || '';
-export const stripe = new Stripe(stripeSecret, { apiVersion: '2022-11-15' });
 
-export const createPaymentIntent = async (amount: number, currency = 'usd', metadata: Record<string, string> = {}) => {
+export const stripe = new Stripe(stripeSecret);
+
+export const createPaymentIntent = async (
+  amount: number,
+  currency: string = 'usd',
+  metadata: Record<string, string> = {}
+) => {
   const paymentIntent = await stripe.paymentIntents.create({
-    amount: Math.round(amount * 100), // amount in cents
+    amount: Math.round(amount * 100),
     currency,
     metadata,
   });

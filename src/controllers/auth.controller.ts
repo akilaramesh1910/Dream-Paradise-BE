@@ -93,11 +93,9 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
 // @access  Private
 export const getMe = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    if (!req.user?.id) return res.status(401).json({ message: 'Not authorized' });
     const user = await User.findById(req.user.id);
-    res.status(200).json({
-      success: true,
-      data: user,
-    });
+    return res.status(200).json({ success: true, data: user });
   } catch (error) {
     next(error);
   }

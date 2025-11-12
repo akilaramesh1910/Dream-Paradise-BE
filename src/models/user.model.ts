@@ -8,60 +8,41 @@ export interface IUser extends Document {
   password: string;
   role: 'user' | 'admin';
   createdAt: Date;
-  matchPassword: (enteredPassword: string) => Promise<boolean>;
-  getSignedJwtToken: () => string;
+  matchPassword(enteredPassword: string): Promise<boolean>;
+  getSignedJwtToken(): string;
 }
 
 const userSchema = new Schema<IUser>({
-  name: {
-    type: String,
-    required: [true, 'Please add a name'],
-  },
+  name: { type: String, required: [true, 'Please add a name'] },
   email: {
     type: String,
     required: [true, 'Please add an email'],
     unique: true,
-    match: [
-      /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
-      'Please add a valid email',
-    ],
+    match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please add a valid email'],
   },
-  password: {
-    type: String,
-    required: [true, 'Please add a password'],
-    minlength: 6,
-    select: false,
-  },
-  role: {
-    type: String,
-    enum: ['user', 'admin'],
-    default: 'user',
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
+  password: { type: String, required: [true, 'Please add a password'], minlength: 6, select: false },
+  role: { type: String, enum: ['user', 'admin'], default: 'user' },
+  createdAt: { type: Date, default: Date.now },
 });
 
-// Encrypt password using bcrypt
+// Encrypt password
 userSchema.pre('save', async function (next) {
   if (!this.isModified('password')) {
-    next();
+    return next();
   }
-
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
+  next();
 });
 
-// Match user entered password to hashed password in database
-userSchema.methods.matchPassword = async function (enteredPassword: string) {
-  return await bcrypt.compare(enteredPassword, this.password);
+userSchema.methods.matchPassword = async function (enteredPassword: string): Promise<boolean> {
+  return bcrypt.compare(enteredPassword, this.password);
 };
 
-// Sign JWT and return
-userSchema.methods.getSignedJwtToken = function () {
+userSchema.methods.getSignedJwtToken = function (): string {
+  const expiresIn = process.env.JWT_EXPIRE as string | undefined; // e.g., '7d'
   return jwt.sign({ id: this._id }, process.env.JWT_SECRET as string, {
-    expiresIn: process.env.JWT_EXPIRE,
+    expiresIn: expiresIn || '7d',
   });
 };
 
