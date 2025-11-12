@@ -2,7 +2,9 @@ import { Request, Response, NextFunction } from 'express';
 import Cart from '../models/cart.model';
 import Product from '../models/product.model';
 import { CustomError } from '../middleware/error.middleware';
-import { AuthRequest } from '../middleware/auth.middleware';
+
+type AuthUser = { id: string; role?: string };
+type AuthRequest = Request & { user: AuthUser };
 
 // @desc    Get user's cart
 // @route   GET /api/cart

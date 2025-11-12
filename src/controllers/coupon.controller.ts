@@ -1,7 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 import Coupon from '../models/coupon.model';
 import { CustomError } from '../middleware/error.middleware';
-import { AuthRequest } from '../middleware/auth.middleware';
+
+type AuthUser = { id: string; role?: string };
+type AuthRequest = Request & { user: AuthUser };
 
 // @desc Create coupon (Admin)
 // @route POST /api/coupons

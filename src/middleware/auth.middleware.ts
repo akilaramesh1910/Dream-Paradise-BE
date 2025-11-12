@@ -4,7 +4,7 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 
 type TokenPayload = JwtPayload & { id: string; role?: string };
 
-export const protect = async (req: Request, res: Response, next: NextFunction) => {
+export const AuthReq = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const auth = req.headers.authorization;
     const token = auth?.startsWith('Bearer ') ? auth.slice(7) : undefined;

@@ -5,11 +5,11 @@ import {
   removeFromWishlist,
   clearWishlist,
 } from '../controllers/wishlist.controller';
-import { protect } from '../middleware/auth.middleware';
+import { AuthReq } from '../middleware/auth.middleware';
 
 const router = express.Router();
 
-router.use(protect); // All wishlist routes are protected
+router.use(AuthReq); // All wishlist routes are AuthReqed
 
 router.route('/')
   .get(getWishlist)

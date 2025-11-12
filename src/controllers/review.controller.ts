@@ -2,7 +2,9 @@ import { Request, Response, NextFunction } from 'express';
 import Review from '../models/review.model';
 import Product from '../models/product.model';
 import { CustomError } from '../middleware/error.middleware';
-import { AuthRequest } from '../middleware/auth.middleware';
+
+type AuthUser = { id: string; role?: string };
+type AuthRequest = Request & { user: AuthUser };
 
 // @desc    Get all reviews for a product
 // @route   GET /api/products/:productId/reviews

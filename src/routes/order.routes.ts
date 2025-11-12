@@ -6,7 +6,7 @@ import {
   getOrderById,
   updateOrderToDelivered,
 } from '../controllers/order.controller';
-import { protect } from '../middleware/auth.middleware';
+import { AuthReq } from '../middleware/auth.middleware';
 import { isAdmin } from '../middleware/role.middleware';
 
 const router = express.Router();
@@ -14,12 +14,12 @@ const router = express.Router();
 // Stripe webhook needs raw body; we will mount it at /api/orders/webhook separately in server
 router.post('/webhook', express.raw({ type: 'application/json' }), stripeWebhookHandler);
 
-// Protected routes for orders
-router.post('/', protect, createOrder);
-router.get('/', protect, getOrdersForUser);
-router.get('/:id', protect, getOrderById);
+// AuthReqed routes for orders
+router.post('/', AuthReq, createOrder);
+router.get('/', AuthReq, getOrdersForUser);
+router.get('/:id', AuthReq, getOrderById);
 
 // Admin route to mark delivered
-router.put('/:id/deliver', protect, isAdmin, updateOrderToDelivered);
+router.put('/:id/deliver', AuthReq, isAdmin, updateOrderToDelivered);
 
 export default router;

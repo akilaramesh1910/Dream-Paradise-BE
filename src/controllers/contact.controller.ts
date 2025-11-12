@@ -2,7 +2,9 @@ import { Request, Response, NextFunction } from 'express';
 import Contact from '../models/contact.model';
 import { sendEmail } from '../utils/email';
 import { CustomError } from '../middleware/error.middleware';
-import { AuthRequest } from '../middleware/auth.middleware';
+
+type AuthUser = { id: string; role?: string };
+type AuthRequest = Request & { user: AuthUser };
 
 // @desc    Submit contact form
 // @route   POST /api/contact

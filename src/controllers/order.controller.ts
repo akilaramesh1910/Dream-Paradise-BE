@@ -3,7 +3,9 @@ import Order from '../models/order.model';
 import Product from '../models/product.model';
 import { stripe, createPaymentIntent } from '../utils/stripe';
 import { CustomError } from '../middleware/error.middleware';
-import { AuthRequest } from '../middleware/auth.middleware';
+
+type AuthUser = { id: string; role?: string };
+type AuthRequest = Request & { user: AuthUser };
 
 // @desc Create an order (and optionally create Stripe PaymentIntent)
 // @route POST /api/orders

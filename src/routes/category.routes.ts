@@ -7,7 +7,7 @@ import {
   updateCategory,
   deleteCategory,
 } from '../controllers/category.controller';
-import { protect } from '../middleware/auth.middleware';
+import { AuthReq } from '../middleware/auth.middleware';
 import { isAdmin } from '../middleware/role.middleware';
 import { validateCategory } from '../middleware/validation.middleware';
 
@@ -18,9 +18,9 @@ router.get('/', getCategories);
 router.get('/:id', getCategory);
 router.get('/slug/:slug', getCategoryBySlug);
 
-// Protected routes (Admin only)
-router.post('/', protect, isAdmin, validateCategory, createCategory);
-router.put('/:id', protect, isAdmin, validateCategory, updateCategory);
-router.delete('/:id', protect, isAdmin, deleteCategory);
+// AuthReqed routes (Admin only)
+router.post('/', AuthReq, isAdmin, validateCategory, createCategory);
+router.put('/:id', AuthReq, isAdmin, validateCategory, updateCategory);
+router.delete('/:id', AuthReq, isAdmin, deleteCategory);
 
 export default router;
