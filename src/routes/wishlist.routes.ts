@@ -9,7 +9,7 @@ import { AuthReq } from '../middleware/auth.middleware';
 
 const router = express.Router();
 
-router.use(AuthReq); // All wishlist routes are AuthReqed
+router.use(AuthReq);
 
 router.route('/')
   .get(getWishlist)

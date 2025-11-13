@@ -4,7 +4,6 @@ import Product from '../models/product.model';
 import { CustomError } from '../middleware/error.middleware';
 
 type AuthUser = { id: string; role?: string };
-type AuthRequest = Request & { user: AuthUser };
 
 // @desc    Get all reviews for a product
 // @route   GET /api/products/:productId/reviews
@@ -49,7 +48,7 @@ export const getReview = async (req: Request, res: Response, next: NextFunction)
 // @desc    Add review
 // @route   POST /api/products/:productId/reviews
 // @access  Private
-export const addReview = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const addReview = async (req: any, res: Response, next: NextFunction) => {
   try {
     const product = await Product.findById(req.params.productId);
     if (!product) {
@@ -60,7 +59,7 @@ export const addReview = async (req: AuthRequest, res: Response, next: NextFunct
 
     // Check if user already reviewed this product
     const existingReview = await Review.findOne({
-      user: req.user.id,
+      user: req.user?.id,
       product: req.params.productId,
     });
 
@@ -72,7 +71,7 @@ export const addReview = async (req: AuthRequest, res: Response, next: NextFunct
 
     const review = await Review.create({
       ...req.body,
-      user: req.user.id,
+      user: req.user?.id,
       product: req.params.productId,
     });
 
@@ -90,7 +89,7 @@ export const addReview = async (req: AuthRequest, res: Response, next: NextFunct
 // @desc    Update review
 // @route   PUT /api/reviews/:id
 // @access  Private
-export const updateReview = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const updateReview = async (req: any, res: Response, next: NextFunction) => {
   try {
     let review = await Review.findById(req.params.id);
 
@@ -101,7 +100,7 @@ export const updateReview = async (req: AuthRequest, res: Response, next: NextFu
     }
 
     // Make sure review belongs to user
-    if (review.user.toString() !== req.user.id) {
+    if (review.user.toString() !== req.user?.id) {
       const error: CustomError = new Error('Not authorized to update this review');
       error.statusCode = 401;
       throw error;
@@ -128,7 +127,7 @@ export const updateReview = async (req: AuthRequest, res: Response, next: NextFu
 // @desc    Delete review
 // @route   DELETE /api/reviews/:id
 // @access  Private
-export const deleteReview = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const deleteReview = async (req: any, res: Response, next: NextFunction) => {
   try {
     const review = await Review.findById(req.params.id);
 
@@ -139,7 +138,7 @@ export const deleteReview = async (req: AuthRequest, res: Response, next: NextFu
     }
 
     // Make sure review belongs to user or user is admin
-    if (review.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    if (review.user.toString() !== req.user?.id && req.user?.role !== 'admin') {
       const error: CustomError = new Error('Not authorized to delete this review');
       error.statusCode = 401;
       throw error;

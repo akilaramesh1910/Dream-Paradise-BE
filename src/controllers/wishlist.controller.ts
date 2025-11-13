@@ -4,18 +4,17 @@ import Product from '../models/product.model';
 import { CustomError } from '../middleware/error.middleware';
 
 type AuthUser = { id: string; role?: string };
-type AuthRequest = Request & { user: AuthUser };
 
 // @desc    Get user's wishlist
 // @route   GET /api/wishlist
 // @access  Private
-export const getWishlist = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const getWishlist = async (req: any, res: Response, next: NextFunction) => {
   try {
-    let wishlist = await Wishlist.findOne({ user: req.user.id }).populate('products');
+    let wishlist = await Wishlist.findOne({ user: req.user?.id }).populate('products');
 
     if (!wishlist) {
       wishlist = await Wishlist.create({
-        user: req.user.id,
+        user: req.user?.id,
         products: [],
       });
     }
@@ -32,7 +31,7 @@ export const getWishlist = async (req: AuthRequest, res: Response, next: NextFun
 // @desc    Add product to wishlist
 // @route   POST /api/wishlist/:productId
 // @access  Private
-export const addToWishlist = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const addToWishlist = async (req: any, res: Response, next: NextFunction) => {
   try {
     const product = await Product.findById(req.params.productId);
     if (!product) {
@@ -41,11 +40,11 @@ export const addToWishlist = async (req: AuthRequest, res: Response, next: NextF
       throw error;
     }
 
-    let wishlist = await Wishlist.findOne({ user: req.user.id });
+    let wishlist = await Wishlist.findOne({ user: req.user?.id });
 
     if (!wishlist) {
       wishlist = await Wishlist.create({
-        user: req.user.id,
+        user: req.user?.id,
         products: [req.params.productId],
       });
     } else {
@@ -71,9 +70,9 @@ export const addToWishlist = async (req: AuthRequest, res: Response, next: NextF
 // @desc    Remove product from wishlist
 // @route   DELETE /api/wishlist/:productId
 // @access  Private
-export const removeFromWishlist = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const removeFromWishlist = async (req: any, res: Response, next: NextFunction) => {
   try {
-    const wishlist = await Wishlist.findOne({ user: req.user.id });
+    const wishlist = await Wishlist.findOne({ user: req.user?.id });
     if (!wishlist) {
       const error: CustomError = new Error('Wishlist not found');
       error.statusCode = 404;
@@ -99,9 +98,9 @@ export const removeFromWishlist = async (req: AuthRequest, res: Response, next: 
 // @desc    Clear wishlist
 // @route   DELETE /api/wishlist
 // @access  Private
-export const clearWishlist = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const clearWishlist = async (req: any, res: Response, next: NextFunction) => {
   try {
-    const wishlist = await Wishlist.findOne({ user: req.user.id });
+    const wishlist = await Wishlist.findOne({ user: req.user?.id });
     if (!wishlist) {
       const error: CustomError = new Error('Wishlist not found');
       error.statusCode = 404;

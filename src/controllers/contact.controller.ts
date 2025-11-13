@@ -4,7 +4,6 @@ import { sendEmail } from '../utils/email';
 import { CustomError } from '../middleware/error.middleware';
 
 type AuthUser = { id: string; role?: string };
-type AuthRequest = Request & { user: AuthUser };
 
 // @desc    Submit contact form
 // @route   POST /api/contact
@@ -46,7 +45,7 @@ export const submitContact = async (req: Request, res: Response, next: NextFunct
 // @desc    Get all contact submissions
 // @route   GET /api/contact
 // @access  Private/Admin
-export const getContacts = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const getContacts = async (req: any, res: Response, next: NextFunction) => {
   try {
     const contacts = await Contact.find().sort('-createdAt');
 
@@ -62,7 +61,7 @@ export const getContacts = async (req: AuthRequest, res: Response, next: NextFun
 // @desc    Get single contact submission
 // @route   GET /api/contact/:id
 // @access  Private/Admin
-export const getContact = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const getContact = async (req: any, res: Response, next: NextFunction) => {
   try {
     const contact = await Contact.findById(req.params.id);
 
@@ -84,7 +83,7 @@ export const getContact = async (req: AuthRequest, res: Response, next: NextFunc
 // @desc    Update contact status
 // @route   PUT /api/contact/:id
 // @access  Private/Admin
-export const updateContactStatus = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const updateContactStatus = async (req: any, res: Response, next: NextFunction) => {
   try {
     const contact = await Contact.findByIdAndUpdate(
       req.params.id,

@@ -5,12 +5,11 @@ import { stripe, createPaymentIntent } from '../utils/stripe';
 import { CustomError } from '../middleware/error.middleware';
 
 type AuthUser = { id: string; role?: string };
-type AuthRequest = Request & { user: AuthUser };
 
 // @desc Create an order (and optionally create Stripe PaymentIntent)
 // @route POST /api/orders
 // @access Private
-export const createOrder = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const createOrder = async (req: any, res: Response, next: NextFunction) => {
   try {
     const { items, shippingAddress, paymentMethod, couponCode, discountAmount } = req.body;
 
@@ -27,7 +26,7 @@ export const createOrder = async (req: AuthRequest, res: Response, next: NextFun
     const totalPrice = itemsPrice + taxPrice + shippingPrice - (discountAmount || 0);
 
     const order = await Order.create({
-      user: req.user.id,
+      user: req.user?.id,
       items,
       shippingAddress,
       paymentMethod,
@@ -84,9 +83,9 @@ export const stripeWebhookHandler = async (req: Request, res: Response, next: Ne
 // @desc Get orders for user
 // @route GET /api/orders
 // @access Private
-export const getOrdersForUser = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const getOrdersForUser = async (req: any, res: Response, next: NextFunction) => {
   try {
-    const orders = await Order.find({ user: req.user.id }).sort('-createdAt');
+    const orders = await Order.find({ user: req.user?.id }).sort('-createdAt');
     res.status(200).json({ success: true, data: orders });
   } catch (error) {
     next(error);
@@ -96,7 +95,7 @@ export const getOrdersForUser = async (req: AuthRequest, res: Response, next: Ne
 // @desc Get single order
 // @route GET /api/orders/:id
 // @access Private
-export const getOrderById = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const getOrderById = async (req: any, res: Response, next: NextFunction) => {
   try {
     const order = await Order.findById(req.params.id).populate('user', 'name email');
     if (!order) {
@@ -105,7 +104,7 @@ export const getOrderById = async (req: AuthRequest, res: Response, next: NextFu
       throw err;
     }
     // ensure user owns the order or is admin
-    if (order.user.toString() !== req.user.id && req.user.role !== 'admin') {
+    if (order.user.toString() !== req.user?.id && req.user?.role !== 'admin') {
       const err: CustomError = new Error('Not authorized to view this order');
       err.statusCode = 401;
       throw err;
@@ -119,7 +118,7 @@ export const getOrderById = async (req: AuthRequest, res: Response, next: NextFu
 // @desc Update order to delivered (admin)
 // @route PUT /api/orders/:id/deliver
 // @access Private/Admin
-export const updateOrderToDelivered = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const updateOrderToDelivered = async (req: any, res: Response, next: NextFunction) => {
   try {
     const order = await Order.findById(req.params.id);
     if (!order) {

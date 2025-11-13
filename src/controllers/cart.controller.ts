@@ -4,14 +4,13 @@ import Product from '../models/product.model';
 import { CustomError } from '../middleware/error.middleware';
 
 type AuthUser = { id: string; role?: string };
-type AuthRequest = Request & { user: AuthUser };
 
 // @desc    Get user's cart
 // @route   GET /api/cart
 // @access  Private
-export const getCart = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const getCart = async (req: any, res: Response, next: NextFunction) => {
   try {
-    const cart = await Cart.findOne({ user: req.user.id }).populate('items.product');
+    const cart = await Cart.findOne({ user: req.user?.id }).populate('items.product');
 
     if (!cart) {
       return res.status(200).json({
@@ -32,7 +31,7 @@ export const getCart = async (req: AuthRequest, res: Response, next: NextFunctio
 // @desc    Add item to cart
 // @route   POST /api/cart
 // @access  Private
-export const addToCart = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const addToCart = async (req: any, res: Response, next: NextFunction) => {
   try {
     const { productId, quantity } = req.body;
 
@@ -89,7 +88,7 @@ export const addToCart = async (req: AuthRequest, res: Response, next: NextFunct
 // @desc    Update cart item quantity
 // @route   PUT /api/cart/:productId
 // @access  Private
-export const updateCartItem = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const updateCartItem = async (req: any, res: Response, next: NextFunction) => {
   try {
     const { quantity } = req.body;
     const { productId } = req.params;
@@ -140,7 +139,7 @@ export const updateCartItem = async (req: AuthRequest, res: Response, next: Next
 // @desc    Remove item from cart
 // @route   DELETE /api/cart/:productId
 // @access  Private
-export const removeFromCart = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const removeFromCart = async (req: any, res: Response, next: NextFunction) => {
   try {
     const cart = await Cart.findOne({ user: req.user.id });
     if (!cart) {
@@ -168,7 +167,7 @@ export const removeFromCart = async (req: AuthRequest, res: Response, next: Next
 // @desc    Clear cart
 // @route   DELETE /api/cart
 // @access  Private
-export const clearCart = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const clearCart = async (req: any, res: Response, next: NextFunction) => {
   try {
     const cart = await Cart.findOne({ user: req.user.id });
     if (!cart) {

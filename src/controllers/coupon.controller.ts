@@ -3,12 +3,11 @@ import Coupon from '../models/coupon.model';
 import { CustomError } from '../middleware/error.middleware';
 
 type AuthUser = { id: string; role?: string };
-type AuthRequest = Request & { user: AuthUser };
 
 // @desc Create coupon (Admin)
 // @route POST /api/coupons
 // @access Private/Admin
-export const createCoupon = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const createCoupon = async (req: any, res: Response, next: NextFunction) => {
   try {
     const coupon = await Coupon.create(req.body);
     res.status(201).json({ success: true, data: coupon });
@@ -80,7 +79,7 @@ export const validateCoupon = async (req: Request, res: Response, next: NextFunc
 // @desc Redeem coupon (decrement usage) - typically called when order completes
 // @route POST /api/coupons/redeem
 // @access Private
-export const redeemCoupon = async (req: AuthRequest, res: Response, next: NextFunction) => {
+export const redeemCoupon = async (req: any, res: Response, next: NextFunction) => {
   try {
     const { code } = req.body;
     const coupon = await Coupon.findOne({ code: code.toUpperCase(), active: true });

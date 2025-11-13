@@ -1,4 +1,3 @@
-// auth.middleware.ts
 import { Request, Response, NextFunction } from 'express';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 
@@ -13,7 +12,7 @@ export const AuthReq = async (req: Request, res: Response, next: NextFunction) =
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as TokenPayload;
     if (!decoded?.id) return res.status(401).json({ message: 'Token invalid' });
 
-    req.user = { id: decoded.id, role: decoded.role }; // now matches the global type
+    req.user = { id: decoded.id, role: decoded.role }; // ✅ Now no TS error
     return next();
   } catch {
     return res.status(401).json({ message: 'Not authorized' });
