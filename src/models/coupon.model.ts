@@ -8,11 +8,14 @@ export interface ICoupon extends Document {
   minPurchase?: number;
   maxDiscount?: number;
   usageLimit?: number; // total uses allowed
-  usedCount?: number;
+  usedCount: number; // ✅ make required (default handles value)
   validFrom?: Date;
   validUntil?: Date;
   active: boolean;
   createdAt: Date;
+
+  // ✅ add schema method typing
+  incrementUsage(): Promise<void>;
 }
 
 const couponSchema = new Schema<ICoupon>({
@@ -48,7 +51,8 @@ const couponSchema = new Schema<ICoupon>({
   },
   usedCount: {
     type: Number,
-    default: 0,
+    required: true,
+    default: 0, // ✅ ensures it always has a value
   },
   validFrom: {
     type: Date,
@@ -66,9 +70,9 @@ const couponSchema = new Schema<ICoupon>({
   },
 });
 
-// Increment usedCount safely
-couponSchema.methods.incrementUsage = async function () {
-  this.usedCount = (this.usedCount || 0) + 1;
+// ✅ TypeScript-aware method definition
+couponSchema.methods.incrementUsage = async function (this: ICoupon): Promise<void> {
+  this.usedCount += 1;
   await this.save();
 };
 

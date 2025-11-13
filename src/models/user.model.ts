@@ -40,10 +40,18 @@ userSchema.methods.matchPassword = async function (enteredPassword: string): Pro
 };
 
 userSchema.methods.getSignedJwtToken = function (): string {
-  const expiresIn = process.env.JWT_EXPIRE as string | undefined; // e.g., '7d'
-  return jwt.sign({ id: this._id }, process.env.JWT_SECRET as string, {
-    expiresIn: expiresIn || '7d',
-  });
+  const jwtSecret = process.env.JWT_SECRET;
+  const jwtExpire = process.env.JWT_EXPIRE || '7d';
+
+  if (!jwtSecret) {
+    throw new Error('JWT_SECRET is not defined');
+  }
+
+  return jwt.sign(
+    { id: this._id },
+    jwtSecret as jwt.Secret, // 👈 assert type
+    { expiresIn: jwtExpire } as jwt.SignOptions // 👈 assert type
+  );
 };
 
 export default mongoose.model<IUser>('User', userSchema);

@@ -144,7 +144,7 @@ export const deleteReview = async (req: any, res: Response, next: NextFunction) 
       throw error;
     }
 
-    await review.remove();
+    await Review.findByIdAndDelete(review._id);
 
     res.status(200).json({
       success: true,

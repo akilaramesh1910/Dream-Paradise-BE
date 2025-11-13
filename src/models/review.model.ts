@@ -78,8 +78,10 @@ reviewSchema.post('save', function() {
 });
 
 // Call calculateAverageRating after remove
-reviewSchema.post('remove', function() {
-  (this.constructor as any).calculateAverageRating(this.product);
+reviewSchema.post('findOneAndDelete', async function (doc: IReview) {
+  if (doc) {
+    await (doc.constructor as any).calculateAverageRating(doc.product);
+  }
 });
 
 export default mongoose.model<IReview>('Review', reviewSchema);

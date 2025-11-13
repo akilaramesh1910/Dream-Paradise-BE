@@ -1,6 +1,7 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IOrder extends Document {
+  _id: mongoose.Types.ObjectId; 
   user: mongoose.Types.ObjectId;
   products: Array<{
     product: mongoose.Types.ObjectId;
@@ -27,6 +28,8 @@ export interface IOrder extends Document {
     discount: number;
   };
   status: string;
+  isDelivered?: boolean; // ✅ add this
+  deliveredAt?: Date; // ✅ add this
   createdAt: Date;
 }
 
@@ -86,6 +89,8 @@ const orderSchema = new Schema<IOrder>({
     enum: ['pending', 'processing', 'shipped', 'delivered', 'cancelled'],
     default: 'pending',
   },
+  isDelivered: { type: Boolean, default: false }, // ✅ add this
+  deliveredAt: { type: Date }, // ✅ add this
   createdAt: {
     type: Date,
     default: Date.now,
