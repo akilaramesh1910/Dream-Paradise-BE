@@ -64,6 +64,7 @@ const connectDB = async () => {
 const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
+  console.log("calinng ---------")
   try {
     await connectDB();
     app.listen(PORT, () => {
