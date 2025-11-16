@@ -44,7 +44,7 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/coupons', couponRoutes);
 app.use('/api/custom-request', customRequestRoutes);
 // Swagger docs
-setupSwagger(app);
+// setupSwagger(app);
 
 // Error handling
 app.use(errorHandler);
@@ -64,7 +64,6 @@ const connectDB = async () => {
 const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
-  console.log("calinng ---------")
   try {
     await connectDB();
     app.listen(PORT, () => {
