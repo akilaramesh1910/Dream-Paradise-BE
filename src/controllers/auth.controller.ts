@@ -63,6 +63,10 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       throw error;
     }
 
+    console.log('User found:', user);
+    console.log('User password:', user.password);
+    console.log('User role:', user.role);
+
     // Check if password matches
     const isMatch = await user.matchPassword(password);
     if (!isMatch) {
