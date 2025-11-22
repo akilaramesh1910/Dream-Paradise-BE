@@ -48,7 +48,7 @@ userSchema.methods.getSignedJwtToken = function (): string {
   }
 
   return jwt.sign(
-    { id: this._id },
+    { id: this._id, role: this.role },
     jwtSecret as jwt.Secret, // 👈 assert type
     { expiresIn: jwtExpire } as jwt.SignOptions // 👈 assert type
   );

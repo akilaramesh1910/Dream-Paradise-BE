@@ -4,11 +4,11 @@ import { CustomError } from './error.middleware';
 type AuthUser = { _id: string; role: 'user' | 'admin' };
 
 export const isAdmin: RequestHandler = (req, res, next) => {
-  const user = (req as any).user as AuthUser | undefined;
-  if (user && user.role === 'admin') {
-    return next();
+  if (req.user?.role !== 'admin') {
+    console.log('User role is not admin:', req.user?.role);
+    return res.status(403).json({ success: false, error: 'Not authorized as an admin' });
   }
-  const error: CustomError = new Error('Not authorized as an admin') as CustomError;
-  error.statusCode = 403;
-  next(error);
+
+  console.log('User authorized as admin');
+  return next();
 };
