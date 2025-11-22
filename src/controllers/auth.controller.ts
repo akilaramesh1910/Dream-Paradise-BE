@@ -72,6 +72,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     }
 
     const token = user.getSignedJwtToken();
+    console.log('Generated JWT token:', token);
 
     res.status(200).json({
       success: true,

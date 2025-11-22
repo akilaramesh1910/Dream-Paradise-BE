@@ -14,6 +14,9 @@ export const AuthReq = async (req: Request, res: Response, next: NextFunction) =
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as TokenPayload;
 
+    console.log('Decoded JWT token:', decoded);
+
+
     if (!decoded?.id) {
       console.log('Token invalid: missing id', decoded);
       return res.status(401).json({ message: 'Token invalid' });
