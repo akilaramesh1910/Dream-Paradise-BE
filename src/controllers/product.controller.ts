@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import Product from '../models/product.model';
 import { CustomError } from '../middleware/error.middleware';
+import Category from '../models/category.model';
 
 // @desc    Get all products
 // @route   GET /api/products
@@ -77,14 +78,16 @@ export const getProduct = async (req: Request, res: Response, next: NextFunction
 // @desc    Create new product
 // @route   POST /api/products
 // @access  Private/Admin
-export const createProduct = async (req: Request, res: Response, next: NextFunction) => {
+export const createProduct = async (req: any, res: any, next: any) => {
   try {
     const product = await Product.create(req.body);
-
-    res.status(201).json({
-      success: true,
-      data: product,
+    
+    // Update category's products array
+    await Category.findByIdAndUpdate(product.category, {
+      $push: { products: product._id },
     });
+
+    res.status(201).json({ success: true, data: product });
   } catch (error) {
     next(error);
   }
