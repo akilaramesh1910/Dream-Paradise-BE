@@ -62,11 +62,6 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
       error.statusCode = 401;
       throw error;
     }
-
-    console.log('User found:', user);
-    console.log('User password:', user.password);
-    console.log('User role:', user.role);
-
     // Check if password matches
     const isMatch = await user.matchPassword(password);
     if (!isMatch) {
@@ -76,7 +71,6 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     }
 
     const token = user.getSignedJwtToken();
-    console.log('Generated JWT token:', token);
 
     res.status(200).json({
       success: true,
