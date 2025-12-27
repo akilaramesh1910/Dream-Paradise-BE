@@ -16,6 +16,7 @@ import contactRoutes from './routes/contact.routes';
 import reviewRoutes from './routes/review.routes';
 import couponRoutes from './routes/coupon.routes';
 import customRequestRoutes from './routes/customRequest.routes';
+import paymentRoutes from './routes/payment.routes';
 import { setupSwagger } from './swagger';
 
 // Error handling middleware
@@ -47,6 +48,7 @@ app.use('/api/contact', contactRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/coupons', couponRoutes);
 app.use('/api/custom-request', customRequestRoutes);
+app.use('/api/payment', paymentRoutes);
 // Swagger docs
 // setupSwagger(app);
 

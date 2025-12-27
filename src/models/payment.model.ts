@@ -2,7 +2,11 @@ import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IPayment extends Document {
     userId: mongoose.Types.ObjectId;
-    paymentIntentId: string;
+    paymentIntentId?: string;
+    razorpayOrderId?: string;
+    razorpayPaymentId?: string;
+    razorpaySignature?: string;
+    provider: 'stripe' | 'razorpay';
     amount: number;
     currency: string;
     status: 'pending' | 'succeeded' | 'failed' | 'canceled';
@@ -38,8 +42,29 @@ const paymentSchema = new Schema<IPayment>(
         },
         paymentIntentId: {
             type: String,
-            required: true,
+            required: false,
             unique: true,
+            sparse: true,
+        },
+        razorpayOrderId: {
+            type: String,
+            required: false,
+            unique: true,
+            sparse: true,
+        },
+        razorpayPaymentId: {
+            type: String,
+            required: false,
+        },
+        razorpaySignature: {
+            type: String,
+            required: false,
+        },
+        provider: {
+            type: String,
+            enum: ['stripe', 'razorpay'],
+            default: 'stripe',
+            required: true,
         },
         amount: {
             type: Number,
