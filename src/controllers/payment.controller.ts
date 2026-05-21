@@ -8,10 +8,20 @@ import Razorpay from 'razorpay';
 // Initialize Stripe - remove apiVersion or use supported version
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
-const razorpay = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID || '',
-    key_secret: process.env.RAZORPAY_KEY_SECRET || '',
-});
+let razorpay: any = null;
+
+try {
+    if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) {
+        razorpay = new Razorpay({
+            key_id: process.env.RAZORPAY_KEY_ID,
+            key_secret: process.env.RAZORPAY_KEY_SECRET,
+        });
+    } else {
+        console.warn('Razorpay credentials (RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET) are missing. Razorpay payments will be disabled.');
+    }
+} catch (error) {
+    console.error('Failed to initialize Razorpay:', error);
+}
 
 export const createPaymentIntent = async (req: Request, res: Response) => {
     try {
@@ -101,6 +111,10 @@ export const createRazorpayOrder = async (req: Request, res: Response) => {
             return res.status(400).json({ error: 'Amount is required' });
         }
 
+        if (!razorpay) {
+            return res.status(500).json({ error: 'Razorpay payment is not configured on this server.' });
+        }
+
         const options = {
             amount: Math.round(amount * 100),
             currency,
@@ -146,6 +160,10 @@ export const verifyRazorpayPayment = async (req: Request, res: Response) => {
 
         if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
             return res.status(400).json({ error: 'Missing payment verification details' });
+        }
+
+        if (!razorpay) {
+            return res.status(500).json({ error: 'Razorpay payment is not configured on this server.' });
         }
 
         const body = razorpay_order_id + '|' + razorpay_payment_id;
