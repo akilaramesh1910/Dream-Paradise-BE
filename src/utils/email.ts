@@ -10,59 +10,70 @@ interface EmailOptions {
   data?: Record<string, any>;
 }
 
-// Create reusable transporter object using SMTP transport
+// Create transporter
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: parseInt(process.env.SMTP_PORT || '587'),
-  secure: process.env.SMTP_PORT === '465', // true for 465, false for other ports
+  secure: false,
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
+
+  connectionTimeout: 10000,
+  greetingTimeout: 10000,
+  socketTimeout: 10000,
 });
 
 // Compile email template
-const compileTemplate = (templateName: string, data: Record<string, any>) => {
-  const templatePath = path.join(__dirname, '../templates/emails', `${templateName}.hbs`);
+const compileTemplate = (
+  templateName: string,
+  data: Record<string, any>
+) => {
+  const templatePath = path.join(
+    __dirname,
+    '../templates/emails',
+    `${templateName}.hbs`
+  );
+
   const source = fs.readFileSync(templatePath, 'utf8');
+
   const template = handlebars.compile(source);
+
   return template(data);
 };
 
-export const sendEmail = async (options: any) => {
+export const sendEmail = async (options: EmailOptions) => {
   try {
     console.log('===== sendEmail CALLED =====');
 
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT),
-      secure: false,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    });
+    // Compile template HTML
+    const html = compileTemplate(
+      options.template,
+      options.data || {}
+    );
 
     const mailOptions = {
       from: `${process.env.SMTP_FROM_NAME} <${process.env.SMTP_FROM_EMAIL}>`,
       to: options.email,
       subject: options.subject,
-      html: `<h1>Test Mail from Dream Paradise</h1>`,
+      html,
     };
 
-    console.log('Sending mail...');
+    console.log('Sending mail to:', options.email);
 
     const info = await transporter.sendMail(mailOptions);
 
-    console.log('Mail sent successfully');
+    console.log('===== MAIL SENT SUCCESS =====');
     console.log(info);
 
     return info;
+
   } catch (error: any) {
     console.log('===== EMAIL ERROR =====');
     console.log(error);
     console.log('Error Message:', error.message);
 
-    throw new Error('Email could not be sent');
+    throw error;
   }
 };
