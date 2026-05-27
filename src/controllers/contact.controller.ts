@@ -22,7 +22,6 @@ export const submitContact = async (
     console.log('Contact saved');
 
     // COMMENT THIS
-    /*
     await sendEmail({
       email: contact.email,
       subject: 'Thank you for contacting us',
@@ -41,7 +40,6 @@ export const submitContact = async (
         message: contact.message,
       },
     });
-    */
 
     res.status(201).json({
       success: true,
