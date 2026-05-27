@@ -34,20 +34,20 @@ export const sendEmail = async (options: any) => {
     console.log('===== sendEmail CALLED =====');
 
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      host: process.env.SMTP_HOST,
+      port: Number(process.env.SMTP_PORT),
+      secure: false,
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
       },
     });
 
-    console.log('Transport created');
-
     const mailOptions = {
       from: `${process.env.SMTP_FROM_NAME} <${process.env.SMTP_FROM_EMAIL}>`,
       to: options.email,
       subject: options.subject,
-      html: `<h1>Test Mail</h1>`,
+      html: `<h1>Test Mail from Dream Paradise</h1>`,
     };
 
     console.log('Sending mail...');
