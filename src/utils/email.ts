@@ -29,21 +29,48 @@ const compileTemplate = (templateName: string, data: Record<string, any>) => {
   return template(data);
 };
 
-export const sendEmail = async ({ email, subject, template, data = {} }: EmailOptions) => {
+export const sendEmail = async (options: any) => {
   try {
-    // Get HTML content
-    const html = compileTemplate(template, data);
+    console.log('===== sendEmail CALLED =====');
+    console.log('Sending to:', options.email);
 
-    // Send email
-    const info = await transporter.sendMail({
-      from: `"${process.env.SMTP_FROM_NAME}" <${process.env.SMTP_FROM_EMAIL}>`,
-      to: email,
-      subject,
-      html,
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: Number(process.env.SMTP_PORT),
+      secure: false,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
     });
 
-    return true;
-  } catch (error) {
+    console.log('Transport created');
+
+    // Verify SMTP connection
+    await transporter.verify();
+
+    console.log('SMTP connection verified');
+
+    const mailOptions = {
+      from: `${process.env.SMTP_FROM_NAME} <${process.env.SMTP_FROM_EMAIL}>`,
+      to: options.email,
+      subject: options.subject,
+      html: `<h1>Test Mail</h1>`,
+    };
+
+    console.log('Sending mail...');
+
+    const info = await transporter.sendMail(mailOptions);
+
+    console.log('Mail sent successfully');
+    console.log(info);
+
+    return info;
+  } catch (error: any) {
+    console.log('===== EMAIL ERROR =====');
+    console.log(error);
+    console.log('Error Message:', error.message);
+
     throw new Error('Email could not be sent');
   }
 };

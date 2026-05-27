@@ -8,11 +8,30 @@ type AuthUser = { id: string; role?: string };
 // @desc    Submit contact form
 // @route   POST /api/contact
 // @access  Public
-export const submitContact = async (req: Request, res: Response, next: NextFunction) => {
+
+export const submitContact = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
   try {
+    console.log('===== CONTACT API HIT =====');
+    console.log('Request Body:', req.body);
+
     const contact = await Contact.create(req.body);
 
+    console.log('Contact saved to DB:', contact);
+
+    console.log('===== EMAIL ENV CHECK =====');
+    console.log('SMTP_HOST:', process.env.SMTP_HOST);
+    console.log('SMTP_PORT:', process.env.SMTP_PORT);
+    console.log('SMTP_USER:', process.env.SMTP_USER);
+    console.log('SMTP_PASS exists:', !!process.env.SMTP_PASS);
+    console.log('ADMIN_EMAIL:', process.env.ADMIN_EMAIL);
+
     // Send auto-reply email to user
+    console.log('===== SENDING USER EMAIL =====');
+
     await sendEmail({
       email: contact.email,
       subject: 'Thank you for contacting us',
@@ -20,7 +39,11 @@ export const submitContact = async (req: Request, res: Response, next: NextFunct
       data: { name: contact.name },
     });
 
+    console.log('User email sent successfully');
+
     // Send notification email to admin
+    console.log('===== SENDING ADMIN EMAIL =====');
+
     await sendEmail({
       email: process.env.ADMIN_EMAIL as string,
       subject: 'New Contact Form Submission',
@@ -33,11 +56,18 @@ export const submitContact = async (req: Request, res: Response, next: NextFunct
       },
     });
 
+    console.log('Admin email sent successfully');
+
     res.status(201).json({
       success: true,
       data: contact,
     });
-  } catch (error) {
+  } catch (error: any) {
+    console.log('===== CONTACT API ERROR =====');
+    console.log(error);
+    console.log('Error Message:', error.message);
+    console.log('Stack:', error.stack);
+
     next(error);
   }
 };
