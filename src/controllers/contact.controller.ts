@@ -16,33 +16,19 @@ export const submitContact = async (
 ) => {
   try {
     console.log('===== CONTACT API HIT =====');
-    console.log('Request Body:', req.body);
 
     const contact = await Contact.create(req.body);
 
-    console.log('Contact saved to DB:', contact);
+    console.log('Contact saved');
 
-    console.log('===== EMAIL ENV CHECK =====');
-    console.log('SMTP_HOST:', process.env.SMTP_HOST);
-    console.log('SMTP_PORT:', process.env.SMTP_PORT);
-    console.log('SMTP_USER:', process.env.SMTP_USER);
-    console.log('SMTP_PASS exists:', !!process.env.SMTP_PASS);
-    console.log('ADMIN_EMAIL:', process.env.ADMIN_EMAIL);
-
-    // Send auto-reply email to user
-    console.log('===== SENDING USER EMAIL =====');
-
+    // COMMENT THIS
+    /*
     await sendEmail({
       email: contact.email,
       subject: 'Thank you for contacting us',
       template: 'contact-auto-reply',
       data: { name: contact.name },
     });
-
-    console.log('User email sent successfully');
-
-    // Send notification email to admin
-    console.log('===== SENDING ADMIN EMAIL =====');
 
     await sendEmail({
       email: process.env.ADMIN_EMAIL as string,
@@ -55,23 +41,17 @@ export const submitContact = async (
         message: contact.message,
       },
     });
-
-    console.log('Admin email sent successfully');
+    */
 
     res.status(201).json({
       success: true,
       data: contact,
     });
-  } catch (error: any) {
-    console.log('===== CONTACT API ERROR =====');
+  } catch (error) {
     console.log(error);
-    console.log('Error Message:', error.message);
-    console.log('Stack:', error.stack);
-
     next(error);
   }
 };
-
 // @desc    Get all contact submissions
 // @route   GET /api/contact
 // @access  Private/Admin
