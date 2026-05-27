@@ -32,12 +32,9 @@ const compileTemplate = (templateName: string, data: Record<string, any>) => {
 export const sendEmail = async (options: any) => {
   try {
     console.log('===== sendEmail CALLED =====');
-    console.log('Sending to:', options.email);
 
     const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST,
-      port: Number(process.env.SMTP_PORT),
-      secure: false,
+      service: 'gmail',
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
@@ -45,11 +42,6 @@ export const sendEmail = async (options: any) => {
     });
 
     console.log('Transport created');
-
-    // Verify SMTP connection
-    await transporter.verify();
-
-    console.log('SMTP connection verified');
 
     const mailOptions = {
       from: `${process.env.SMTP_FROM_NAME} <${process.env.SMTP_FROM_EMAIL}>`,
