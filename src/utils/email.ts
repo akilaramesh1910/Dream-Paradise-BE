@@ -3,7 +3,7 @@ import axios from 'axios';
 interface EmailOptions {
   email: string;
   subject: string;
-  template?: string;
+  type?: 'user' | 'admin';
   data?: Record<string, any>;
 }
 
@@ -11,27 +11,61 @@ export const sendEmail = async (options: EmailOptions) => {
   try {
     console.log('===== sendEmail CALLED =====');
 
-    const html = `
-      <div style="font-family: Arial, sans-serif;">
-        <h2>Dream Paradise</h2>
+    let html = '';
 
-        <p>Hello ${options.data?.name || 'User'},</p>
+    // USER AUTO REPLY
+    if (options.type === 'user') {
+      html = `
+        <div style="font-family: Arial, sans-serif;">
+          <h2>Dream Paradise</h2>
 
-        <p>
-          Thank you for contacting us.
-          We have received your message successfully.
-        </p>
+          <p>Hello ${options.data?.name || 'User'},</p>
 
-        <p>
-          Our team will get back to you soon.
-        </p>
+          <p>
+            Thank you for contacting us.
+            We have received your message successfully.
+          </p>
 
-        <br />
+          <p>Our team will get back to you soon.</p>
 
-        <p>Regards,</p>
-        <p><strong>Dream Paradise Team</strong></p>
-      </div>
-    `;
+          <br />
+
+          <p>Regards,</p>
+          <p><strong>Dream Paradise Team</strong></p>
+        </div>
+      `;
+    }
+
+    // ADMIN EMAIL
+    if (options.type === 'admin') {
+      html = `
+        <div style="font-family: Arial, sans-serif;">
+          <h2>New Contact Form Submission</h2>
+
+          <table border="1" cellpadding="10" cellspacing="0" style="border-collapse: collapse;">
+            <tr>
+              <td><strong>Name</strong></td>
+              <td>${options.data?.name}</td>
+            </tr>
+
+            <tr>
+              <td><strong>Email</strong></td>
+              <td>${options.data?.email}</td>
+            </tr>
+
+            <tr>
+              <td><strong>Subject</strong></td>
+              <td>${options.data?.subject}</td>
+            </tr>
+
+            <tr>
+              <td><strong>Message</strong></td>
+              <td>${options.data?.message}</td>
+            </tr>
+          </table>
+        </div>
+      `;
+    }
 
     const response = await axios.post(
       'https://api.brevo.com/v3/smtp/email',
@@ -61,7 +95,6 @@ export const sendEmail = async (options: EmailOptions) => {
     );
 
     console.log('===== EMAIL SENT SUCCESS =====');
-    console.log(response.data);
 
     return response.data;
 

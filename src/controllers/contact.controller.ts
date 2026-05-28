@@ -31,21 +31,25 @@ export const submitContact = async (
     try {
       console.log('Sending user email...');
 
+      // Auto reply to user
       await sendEmail({
         email: contact.email,
         subject: 'Thank you for contacting us',
-        template: 'contact-auto-reply',
-        data: { name: contact.name },
+        type: 'user',
+        data: {
+          name: contact.name,
+        },
       });
 
       console.log('User email sent');
 
       console.log('Sending admin email...');
 
+      // Contact details to admin
       await sendEmail({
         email: process.env.ADMIN_EMAIL as string,
         subject: 'New Contact Form Submission',
-        template: 'contact-admin-notification',
+        type: 'admin',
         data: {
           name: contact.name,
           email: contact.email,
@@ -55,16 +59,20 @@ export const submitContact = async (
       });
 
       console.log('Admin email sent');
+
     } catch (emailError) {
       console.log('===== BACKGROUND EMAIL ERROR =====');
       console.log(emailError);
     }
 
   } catch (error) {
+    console.log('===== CONTACT API ERROR =====');
     console.log(error);
+
     next(error);
   }
 };
+
 // @desc    Get all contact submissions
 // @route   GET /api/contact
 // @access  Private/Admin
