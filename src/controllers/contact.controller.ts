@@ -8,7 +8,6 @@ type AuthUser = { id: string; role?: string };
 // @desc    Submit contact form
 // @route   POST /api/contact
 // @access  Public
-
 export const submitContact = async (
   req: Request,
   res: Response,
@@ -31,7 +30,7 @@ export const submitContact = async (
     try {
       console.log('Sending user email...');
 
-      // Auto reply to user
+      // Auto reply email to user
       await sendEmail({
         email: contact.email,
         subject: 'Thank you for contacting us',
@@ -45,7 +44,7 @@ export const submitContact = async (
 
       console.log('Sending admin email...');
 
-      // Contact details to admin
+      // Contact details email to admin
       await sendEmail({
         email: process.env.ADMIN_EMAIL as string,
         subject: 'New Contact Form Submission',
@@ -76,7 +75,11 @@ export const submitContact = async (
 // @desc    Get all contact submissions
 // @route   GET /api/contact
 // @access  Private/Admin
-export const getContacts = async (req: any, res: Response, next: NextFunction) => {
+export const getContacts = async (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const contacts = await Contact.find().sort('-createdAt');
 
@@ -92,13 +95,21 @@ export const getContacts = async (req: any, res: Response, next: NextFunction) =
 // @desc    Get single contact submission
 // @route   GET /api/contact/:id
 // @access  Private/Admin
-export const getContact = async (req: any, res: Response, next: NextFunction) => {
+export const getContact = async (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const contact = await Contact.findById(req.params.id);
 
     if (!contact) {
-      const error: CustomError = new Error('Contact submission not found');
+      const error: CustomError = new Error(
+        'Contact submission not found'
+      );
+
       error.statusCode = 404;
+
       throw error;
     }
 
@@ -106,6 +117,7 @@ export const getContact = async (req: any, res: Response, next: NextFunction) =>
       success: true,
       data: contact,
     });
+
   } catch (error) {
     next(error);
   }
@@ -114,11 +126,15 @@ export const getContact = async (req: any, res: Response, next: NextFunction) =>
 // @desc    Update contact status
 // @route   PUT /api/contact/:id
 // @access  Private/Admin
-export const updateContactStatus = async (req: any, res: Response, next: NextFunction) => {
+export const updateContactStatus = async (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
   try {
     const contact = await Contact.findByIdAndUpdate(
       req.params.id,
-      { 
+      {
         status: req.body.status,
         updatedAt: Date.now(),
       },
@@ -129,8 +145,12 @@ export const updateContactStatus = async (req: any, res: Response, next: NextFun
     );
 
     if (!contact) {
-      const error: CustomError = new Error('Contact submission not found');
+      const error: CustomError = new Error(
+        'Contact submission not found'
+      );
+
       error.statusCode = 404;
+
       throw error;
     }
 
@@ -138,6 +158,7 @@ export const updateContactStatus = async (req: any, res: Response, next: NextFun
       success: true,
       data: contact,
     });
+
   } catch (error) {
     next(error);
   }

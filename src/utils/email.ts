@@ -4,6 +4,7 @@ interface EmailOptions {
   email: string;
   subject: string;
   type?: 'user' | 'admin';
+  template?: string;
   data?: Record<string, any>;
 }
 
@@ -13,7 +14,7 @@ export const sendEmail = async (options: EmailOptions) => {
 
     let html = '';
 
-    // USER AUTO REPLY
+    // USER AUTO REPLY EMAIL
     if (options.type === 'user') {
       html = `
         <div style="font-family: Arial, sans-serif;">
@@ -26,7 +27,9 @@ export const sendEmail = async (options: EmailOptions) => {
             We have received your message successfully.
           </p>
 
-          <p>Our team will get back to you soon.</p>
+          <p>
+            Our team will get back to you soon.
+          </p>
 
           <br />
 
@@ -37,12 +40,17 @@ export const sendEmail = async (options: EmailOptions) => {
     }
 
     // ADMIN EMAIL
-    if (options.type === 'admin') {
+    else if (options.type === 'admin') {
       html = `
         <div style="font-family: Arial, sans-serif;">
           <h2>New Contact Form Submission</h2>
 
-          <table border="1" cellpadding="10" cellspacing="0" style="border-collapse: collapse;">
+          <table 
+            border="1" 
+            cellpadding="10" 
+            cellspacing="0" 
+            style="border-collapse: collapse;"
+          >
             <tr>
               <td><strong>Name</strong></td>
               <td>${options.data?.name}</td>
@@ -67,6 +75,19 @@ export const sendEmail = async (options: EmailOptions) => {
       `;
     }
 
+    // DEFAULT EMAIL TEMPLATE
+    else {
+      html = `
+        <div style="font-family: Arial, sans-serif;">
+          <h2>Dream Paradise</h2>
+
+          <p>
+            This is an automated email from Dream Paradise.
+          </p>
+        </div>
+      `;
+    }
+
     const response = await axios.post(
       'https://api.brevo.com/v3/smtp/email',
       {
@@ -85,7 +106,6 @@ export const sendEmail = async (options: EmailOptions) => {
 
         htmlContent: html,
       },
-
       {
         headers: {
           'api-key': process.env.BREVO_API_KEY as string,
@@ -95,6 +115,7 @@ export const sendEmail = async (options: EmailOptions) => {
     );
 
     console.log('===== EMAIL SENT SUCCESS =====');
+    console.log(response.data);
 
     return response.data;
 
